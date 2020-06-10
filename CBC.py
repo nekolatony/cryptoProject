@@ -79,4 +79,5 @@ def CBC_decrypt(cipher):
 
 
 def CR6_decrypt(block):
+    l = 0
     return []
