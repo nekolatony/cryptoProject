@@ -1,15 +1,16 @@
 import cv2 as c
 import numpy as np
+from helpers import *
+from CBC_mode import *
 
-img = c.imread('tiger.jpg',0)
+
+def main():
+    print("Please enter image url:")
+    url = input()
+    img = c.imread(url,0)
+    orginalPixels = ConvertImageToStringArray(img)
+    print(orginalPixels)
+
+    cipheredPixels = CBC_encrypt(orginalPixels)
 
 
-print(img)
-
-c.imshow('original image',img)
-k = c.waitKey(0)
-if k == 27:
-    c.destroyAllWindows()
-elif k == ord('s'):
-    c.imwrite('encrypted_Tiger.jpg' , img-2)
-    c.destroyAllWindows()

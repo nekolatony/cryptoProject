@@ -64,5 +64,16 @@ def generateKey(userkey):
         i = (i + 1) % (2*r + 4)
         j = (j + 1) % enlength
     return s
-    
+
+    #A method that gets an img matrix and convert it to a string list each elemnt size of 32bit
+def ConvertImageToStringArray(img):
+    temp = '\n'.join('\t'.join('%0.0f' % x for x in y) for y in img)
+    imgString = temp.split()
+    print("Image pixles number : " + str(len(imgString)))
+    for i in range(0, len(imgString)):
+        if len(imgString[i]) < 4:
+            imgString[i] = "0" * (4 - len(imgString[i])) + imgString[i]
+    return  imgString
+
+
 
