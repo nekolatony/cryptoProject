@@ -14,3 +14,11 @@ def main():
     cipheredPixels = CBC_encrypt(orginalPixels)
 
 
+
+
+
+
+
+
+if __name__ == "__main__":
+    main()
