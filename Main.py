@@ -8,9 +8,9 @@ def main():
 
     print("Please enter image url:")
     #url = input()
-    url = "five.png"
+    url = "tiger.jpg"
     img = c.imread(url,0)
-    img = [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]]
+  #  img = [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]]
     orginalPixels = ConvertImageToStringArray(img)
     print(len(orginalPixels))
     key = DiffeHellman()
@@ -40,14 +40,23 @@ def main():
     print("Original pixels (String): " + str(orginalPixels))
     print("Encrypted pixels (long): " + str(cipheredPixels))
     print("Encrypted pixels (String): " + str(encrypted))
-
-    decryptedM =  CBC_decrypt(cipheredPixels,RCKey)
+    enc = []
+    de = deBlocker(cipheredPixels)
+    for i in range (0,len(de),4):
+        enc.append(de[i:i+4])
+   # print("deBlocker (String): " +de)
+    decryptedM =  CBC_decrypt(enc,RCKey)
     print("Decrypted pixels: "+ str(decryptedM))
+    print("Original pixels : " + str(orginalPixels))
 
+    k = 0
+    for i in range(len(img)):
+        for j in range(len(img[0])):
+            cipherImage[i][j] = int(cipheredPixels[k]) % 256
+            k = k + 1
+        # print(cipherImage)
 
-
-
-
+    cv2.imwrite('decrypted.png', cipherImage)
 
 
 if __name__ == "__main__":

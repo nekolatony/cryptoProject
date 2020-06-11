@@ -10,11 +10,7 @@ def encrypt(sentence,s):
     B = long(encoded[1],2)
     C = long(encoded[2],2)
     D = long(encoded[3],2)
-    orgi = []
-    orgi.append(A)
-    orgi.append(B)
-    orgi.append(C)
-    orgi.append(D)
+    orgi = [A,B,C,D]
     r=12
     w=32
     modulo = 2**32

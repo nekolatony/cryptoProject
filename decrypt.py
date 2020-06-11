@@ -5,7 +5,7 @@ from helpers import *
 import sys
 
 def decrypt(esentence,s):
-    encoded = blockConverter(esentence)
+    encoded = blockConverter(esentence[0] + esentence[1] + esentence[2] + esentence[3])
     enlength = len(encoded)
     A = long(encoded[0],2)
     B = long(encoded[1],2)

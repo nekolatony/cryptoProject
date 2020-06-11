@@ -28,18 +28,21 @@ def CBC_encrypt(message,key):
     answer = xor_two_str(blocks[0]+blocks[1]+blocks[2]+blocks[3] , "1234567891234567")
 
     orgi,encrypted_block = encrypt(answer, key)
-    cipher = list(encrypted_block)
+    cipher = list(encrypted_block[0:])
 
     for k in range(4, len(blocks) , 4):
         #eCipher = deBlocker(cipher)
         #cipherBlocks = StringToBlocks(eCipher)
-        answer = xor_two_str(blocks[k] + blocks[k+1] + blocks[k+2] + blocks[k+3], deBlocker(encrypted_block))
+        # answer = xor_two_str(blocks[k] + blocks[k+1] + blocks[k+2] + blocks[k+3], deBlocker(encrypted_block))
+
+        answer = xor_two_str(blocks[k] + blocks[k + 1] + blocks[k + 2] + blocks[k + 3], "1234567891234567")
+
         orgi,encrypted_block = encrypt(answer, key)
         cipher.append(encrypted_block[0])
         cipher.append(encrypted_block[1])
         cipher.append(encrypted_block[2])
         cipher.append(encrypted_block[3])
-        print("encryption number " + str(k))
+        # print("encryption number " + str(k))
     return cipher
 
 
@@ -48,17 +51,21 @@ def CBC_encrypt(message,key):
 def CBC_decrypt(message,key):
     blocks = message
 
-    orgi,decrypted_block = decrypt(deBlocker(blocks[0:4]), key)
+    orgi,decrypted_block = decrypt((blocks[0:4]), key)
     answer = xor_two_str(deBlocker(decrypted_block), "1234567891234567")
-    orginal = list(answer)
+    orginal = [answer[:4],answer[4:8],answer[8:12],answer[12:16]]
 
     for k in range(4, len(blocks) , 4):
-        orgi,decrypted_block = decrypt(deBlocker(blocks[0:4]), key)
-        answer = xor_two_str(deBlocker(blocks[k-4:k]), deBlocker(decrypted_block))
+        orgi,decrypted_block = decrypt((blocks[k:k + 4]), key)
+        # answer = xor_two_str(blocks[k-4]+ blocks[k-3] + blocks[k-2] + blocks[k-1], deBlocker(decrypted_block))
+        answer = xor_two_str("1234567891234567", deBlocker(decrypted_block))
+
+        # print("[",k,"] answer ",answer)
+        # print(answer[:4]," ",answer[4:8]," " ,answer[8:12]," ",answer[12:16])
         orginal.append(answer[:4])
         orginal.append(answer[4:8])
         orginal.append(answer[8:12])
-        orginal.append(answer[12:])
-        print("decryption number " + str(k))
+        orginal.append(answer[12:16])
+        # print("decryption number " + str(k))
     return orginal
 

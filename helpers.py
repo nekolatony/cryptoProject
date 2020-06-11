@@ -78,16 +78,17 @@ def ConvertImageToStringArray(img):
     return  imgString
 
 def DiffeHellman():
-    return "A WORD IS A WORD"
+  #  return "A WORD IS A WORD"
+    return  '1234123412341234'
 
 
 def xor_two_str(Mblocks,Cblocks):
     xored = []
-    print(type(Mblocks))
-    print(type(Cblocks))
-    print(Mblocks)
-    print(Cblocks)
-    print(len(Cblocks))
+    # print(type(Mblocks))
+    # print(type(Cblocks))
+    # print(Mblocks)
+    # print(Cblocks)
+    # print(len(Cblocks))
     for i in range(max(len(Mblocks), len(Cblocks))):
         xored_value = ord(Mblocks[i%len(Mblocks)]) ^ ord(Cblocks[i%len(Cblocks)])
         xored.append(hex(xored_value)[2:])
