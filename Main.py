@@ -6,12 +6,15 @@ from CBC_mode import *
 
 def main():
     print("Please enter image url:")
-    url = input()
+    #url = input()
+    url = "tiger.jpg"
     img = c.imread(url,0)
     orginalPixels = ConvertImageToStringArray(img)
+    key = DiffeHellman()
+    RCKey = generateKey(key)
     print(orginalPixels)
 
-    cipheredPixels = CBC_encrypt(orginalPixels)
+    cipheredPixels = CBC_encrypt(orginalPixels , RCKey)
 
 
 
