@@ -73,6 +73,8 @@ def ConvertImageToStringArray(img):
     for i in range(0, len(imgString)):
         if len(imgString[i]) < 4:
             imgString[i] = "0" * (4 - len(imgString[i])) + imgString[i]
+    if len(imgString)%4 != 0:
+       imgString = imgString + ["0000"]*(4 - (len(imgString)%4))
     return  imgString
 
 def DiffeHellman():
@@ -89,4 +91,12 @@ def xor_two_str(Mblocks,Cblocks):
     for i in range(max(len(Mblocks), len(Cblocks))):
         xored_value = ord(Mblocks[i%len(Mblocks)]) ^ ord(Cblocks[i%len(Cblocks)])
         xored.append(hex(xored_value)[2:])
+
+
     return ''.join(xored)
+
+# A method that gets 1 String of lenth 16 chars and convert it to list of 4 block each block 4 chars
+def StringToBlocks(cipherString):
+    cipherBlocks=[]
+    cipherBlocks = [cipherString[i:i+4] for i in range(0, len(cipherString), 4)]
+    return cipherBlocks
