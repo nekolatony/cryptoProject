@@ -86,13 +86,13 @@ def xor_two_str(Mblocks,Cblocks):
     xored = []
     # print(type(Mblocks))
     # print(type(Cblocks))
-    # print(Mblocks)
-    # print(Cblocks)
-    # print(len(Cblocks))
+    print(Mblocks)
+    print(Cblocks)
+    print(len(Cblocks))
     for i in range(max(len(Mblocks), len(Cblocks))):
         xored_value = ord(Mblocks[i%len(Mblocks)]) ^ ord(Cblocks[i%len(Cblocks)])
-        xored.append(hex(xored_value)[2:])
-
+        xored.append(chr(xored_value))
+    print(xored)
 
     return ''.join(xored)
 
@@ -101,3 +101,5 @@ def StringToBlocks(cipherString):
     cipherBlocks=[]
     cipherBlocks = [cipherString[i:i+4] for i in range(0, len(cipherString), 4)]
     return cipherBlocks
+
+
