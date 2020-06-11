@@ -3,17 +3,32 @@ import numpy as np
 from helpers import *
 from CBC_mode import *
 
+import venv
+import PySimpleGUI as sg
+
 
 def main():
 
     print("Please enter image url:")
     #url = input()
-    url = "five.png"
+    url = "tiger.jpg"
     img = c.imread(url,0)
+    cv2.imshow("Original Photo", img)
+    popupmsg("Click OKAY to ENCRYPT!")
+    cv2.waitKey(0)
     #img = [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]]
     orginalPixels = ConvertImageToStringArray(img)
     print(len(orginalPixels))
-    key = DiffeHellman()
+    user1 = venv.DH_Endpoint(197, 151, 199)
+    user2 = venv.DH_Endpoint(197,151,157)
+    alicePartialKey = user1.generate_partial_key()
+    bobPartialKey = user2.generate_partial_key()
+    key = user1.generate_full_key(alicePartialKey)
+    key = user2.generate_full_key(bobPartialKey)
+    key = str(key)
+    if len(key) <16:
+        key = key + " "*(16-len(key))
+    key = key[:16]
     RCKey = generateKey(key)
     print(orginalPixels)
 
@@ -27,14 +42,12 @@ def main():
         for j in range(len(img[0])):
             cipherImage[i][j] = cipheredPixels[k] % 256
             k = k + 1
-        #print(cipherImage)
 
     cv2.imwrite('encrypted.png', cipherImage)
-
-    #cipheredPixels = [cipheredPixels[i:i+4] for i in range(0, len(cipheredPixels), 4)]
-
-    #for i in range(0,len(cipheredPixels)):
-     #   encrypted.append(deBlocker(cipheredPixels[i]))
+    img2 = cv2.imread('encrypted.png',0)
+    cv2.imshow("Encrypted Photo" , img2)
+    popupmsg("Click OKAY to DECRYPT!")
+    cv2.waitKey(0)
 
 
     print("Original pixels (String): " + str(orginalPixels))
@@ -61,9 +74,14 @@ def main():
         # print(cipherImage)
 
     cv2.imwrite('decrypted.png', cipherImage)
-    temp = cv2.imread('decrypted.png',0)
 
+    img3 = cv2.imread('decrypted.png',0)
+    cv2.imshow("Decrypted Photo" , img3)
 
-
+    popupmsg("Click OKAY to Exit!")
+    cv2.waitKey(0)
 if __name__ == "__main__":
     main()
+
+
+
