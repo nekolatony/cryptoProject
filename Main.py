@@ -4,6 +4,7 @@ from helpers import *
 from CBC_mode import *
 import tkinter as tk
 import venv
+import os.path
 
 def closeWindow(root):
     root.destroy()
@@ -100,6 +101,10 @@ def main():
     #url = input()
     url = "tiger.jpg"
     img = c.imread(url,0)
+    #Checking if the img is exist
+    if img is None:
+        popupmsg("No photo found!")
+        return;
     cv2.imwrite('1111.png', img)
 
     root = tk.Tk()
@@ -120,6 +125,3 @@ def main():
     tk.mainloop()
 if __name__ == "__main__":
     main()
-
-
-
