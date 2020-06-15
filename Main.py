@@ -33,7 +33,7 @@ def startDecrypting(root,frame,iframe6,cipherImage,cipheredPixels,orginalPixels,
              k = k + 1
          # print(cipherImage)
 
-     cv2.imwrite('decrypted.png', cipherImage)
+     cv2.imwrite('Resources/decrypted.png', cipherImage)
 
      iframe6.destroy()
      iframe7 = tk.Frame(frame, bd=2, relief=tk.RAISED)
@@ -42,7 +42,7 @@ def startDecrypting(root,frame,iframe6,cipherImage,cipheredPixels,orginalPixels,
      canvas = tk.Canvas(iframe7, width=len(img[0]) + 20, height=len(img) + 20)
      B = tk.Button(iframe7, text="Exit",command = lambda :closeWindow(root)).pack()
      canvas.pack()
-     pic1 = tk.PhotoImage(file="decrypted.png")
+     pic1 = tk.PhotoImage(file="Resources/decrypted.png")
      canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
      canvas.image = pic1
 
@@ -78,7 +78,7 @@ def startEncrypting(root,frame,iframe5,img):
             cipherImage[i][j] = cipheredPixels[k] % 256
             k = k + 1
 
-    cv2.imwrite('encrypted.png', cipherImage)
+    cv2.imwrite('Resources/encrypted.png', cipherImage)
     # B['text'] = 'decrypt'
     # B['command'] = lambda : startDecrypting()
     # pic1['file'] = 'encrypted.png'
@@ -90,7 +90,7 @@ def startEncrypting(root,frame,iframe5,img):
     canvas = tk.Canvas(iframe6, width=len(img[0]) + 20, height=len(img) + 20)
     B = tk.Button(iframe6,bg = '#85D426',fg = '#e0163b', text="Decrypt", command=lambda: startDecrypting(root,frame,iframe6,cipherImage,cipheredPixels,orginalPixels,encrypted,RCKey,img)).pack()
     canvas.pack()
-    pic1 = tk.PhotoImage(file="encrypted.png")
+    pic1 = tk.PhotoImage(file="Resources/encrypted.png")
     canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
     canvas.image = pic1
 
@@ -105,7 +105,7 @@ def main():
     if img is None:
         popupmsg("No photo found!")
         return;
-    cv2.imwrite('1111.png', img)
+    cv2.imwrite('Resources/1111.png', img)
 
     root = tk.Tk()
     frame = tk.Frame(root, width=len(img[0]) + 20, height=len(img) + 20, bd=1)
@@ -117,7 +117,7 @@ def main():
     canvas = tk.Canvas(iframe5, width=len(img[0]) + 20, height=len(img) + 20)
     B = tk.Button(iframe5,fg = '#85D426',bg = '#e0163b' ,text="Encrypt", command=lambda: startEncrypting(root,frame,iframe5,img)).pack()
     canvas.pack()
-    pic1 = tk.PhotoImage(file="1111.png")
+    pic1 = tk.PhotoImage(file="Resources/1111.png")
     canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
 
 

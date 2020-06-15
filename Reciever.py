@@ -2,7 +2,7 @@ import socket
 import pickle
 import time
 from tkinter.ttk import Progressbar
-
+import D_H
 import cv2 as c
 import numpy as np
 from helpers import *
@@ -10,27 +10,53 @@ from CBC_mode import *
 import tkinter as tk
 import venv
 from Communication import *
+import threading
+import D_H
 
 HOST, PORT = "localhost", 8000
 
+# a thread class used to update the GUI when the Image is receiver
+class App(threading.Thread):
 
-def closeWindow(root):
-    root.destroy()
+    def __init__(self, tk_root,frame,iframe6,sock,key):
+        self.root = tk_root
+        self.frame = frame
+        self.iframe6 = iframe6
+        self.sock = sock
+        self.key = key
+        threading.Thread.__init__(self)
+        self.start()
 
-def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,progress):
+    def run(self):
+        cipherImage = pickle.loads(recv_msg(self.sock))
+        cipheredPixels = pickle.loads(recv_msg(self.sock))
+        cv2.imwrite("Resources/reciedImage.png", cipherImage)
+        self.iframe6.destroy();
+        iframe7 = tk.Frame(self.frame, bd=2, relief=tk.RAISED)
+        iframe7.pack(expand=1, fill=tk.X, pady=10, padx=5)
+        label = tk.Label(iframe7, text='Encrypted Image').pack()
+        canvas = tk.Canvas(iframe7, width=len(cipherImage[0]) + 20, height=len(cipherImage) + 20)
+        B = tk.Button(iframe7, text="Decrypt",
+                      command=lambda: startDecrypting(self.root, self.frame, iframe7, cipherImage, cipheredPixels, self.sock,
+                                                      progress,self.key)).pack()
+        canvas.pack()
+        pic1 = tk.PhotoImage(file="Resources/reciedImage.png")
+        canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
+        canvas.image = pic1
+        progress = Progressbar(iframe7, orient=tk.HORIZONTAL,
+                               length=100, mode='determinate')
+        progress.pack(pady=10)
+
+# callback fuction to decrypt the Image
+def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,progress,key):
     progress['value'] = 10
     root.update_idletasks()
     time.sleep(0.2)
 
-    user1 = venv.DH_Endpoint(197, 151, 199)
-    user2 = venv.DH_Endpoint(197, 151, 157)
-    alicePartialKey = user1.generate_partial_key()
-    bobPartialKey = user2.generate_partial_key()
-    key = user1.generate_full_key(alicePartialKey)
-    key = user2.generate_full_key(bobPartialKey)
     progress['value'] = 20
     root.update_idletasks()
     time.sleep(0.1)
+
 
     key = str(key)
     if len(key) < 16:
@@ -68,7 +94,7 @@ def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,progress
     progress['value'] = 80
     root.update_idletasks()
     time.sleep(0.1)
-    cv2.imwrite('Recieverdecrypted.png', cipherImage)
+    cv2.imwrite('Resources/Recieverdecrypted.png', cipherImage)
     progress['value'] = 100
     root.update_idletasks()
     time.sleep(0.1)
@@ -78,9 +104,9 @@ def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,progress
     iframe7.pack(expand=1, fill=tk.X, pady=10, padx=5)
     label = tk.Label(iframe7, text='Decrypted Image').pack()
     canvas = tk.Canvas(iframe7, width=len(cipherImage[0]) + 20, height=len(cipherImage) + 20)
-    B = tk.Button(iframe7, text="Exit", command=lambda: closeWindow(root)).pack()
+    B = tk.Button(iframe7, text="Exit", command=lambda : root.destroy()).pack()
     canvas.pack()
-    pic1 = tk.PhotoImage(file="Recieverdecrypted.png")
+    pic1 = tk.PhotoImage(file="Resources/Recieverdecrypted.png")
     canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
     canvas.image = pic1
 
@@ -93,27 +119,20 @@ def main():
         server_address = (HOST, PORT)
         s.connect(server_address)
 
+        send_msg(s,pickle.dumps('reciever'))
+
+        DH = D_H.new(14)  # used diffie hellman to get the key used in the encryption
+        key = DH.negotiate(s)  # smeding the public key to the reciever and recieving the public key of the reciever
+
         root = tk.Tk()
         root.title("RECIEVER")
-        frame = tk.Frame(root, width=400, height=500 + 20, bd=1)
+        frame = tk.Frame(root, width=20, height=30, bd=1)
         frame.pack()
-        cipherImage = pickle.loads(recv_msg(s))
-        cipheredPixels = pickle.loads(recv_msg(s))
-        cv2.imwrite("reciedImage.png", cipherImage)
         iframe7 = tk.Frame(frame, bd=2, relief=tk.RAISED)
         iframe7.pack(expand=1, fill=tk.X, pady=10, padx=5)
-        label = tk.Label(iframe7, text='Encrypted Image').pack()
-        canvas = tk.Canvas(iframe7, width=len(cipherImage[0]) + 20, height=len(cipherImage) + 20)
-        B = tk.Button(iframe7, text="Decrypt",
-                      command=lambda: startDecrypting(root, frame, iframe7, cipherImage, cipheredPixels, s,
-                                                      progress)).pack()
-        canvas.pack()
-        pic1 = tk.PhotoImage(file="reciedImage.png")
-        canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
-        canvas.image = pic1
-        progress = Progressbar(iframe7, orient=tk.HORIZONTAL,
-                               length=100, mode='determinate')
-        progress.pack(pady=10)
+        label = tk.Label(iframe7, text='Please wait until the photo is recieved').pack()
+
+        App(root,frame,iframe7,s,key)
 
 
 
