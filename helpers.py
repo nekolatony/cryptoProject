@@ -75,17 +75,72 @@ def generateKey(userkey):
         j = (j + 1) % enlength
     return s
 
+def hexListToInt(lst):
+    result = []
+    for i in lst:
+        hex1 = '0x' + i[0:2]
+        hex2 = '0x' +i[2:4]
+        print(" hex 1 : " ,hex1)
+        print(" hex 2 : " ,hex2)
+
+        result.append(int(hex1,16))
+        result.append(int(hex2,16))
+    return result
+
+def chrListToInt(lst):
+        result = []
+        print("size of list = ", len(lst))
+
+        for word in lst:
+            result.append(ord(word[0]))
+            result.append(ord(word[1]))
+            result.append(ord(word[2]))
+            result.append(ord(word[3]))
+        return result
+
     #A method that gets an img matrix and convert it to a string list each elemnt size of 32bit
+# def ConvertImageToStringArray(img):
+#     temp = '\n'.join('\t'.join('%0.0f' % x for x in y) for y in img)
+#     imgString = temp.split()
+#     print("Image pixles number : " + str(len(imgString)))
+#     for i in range(0, len(imgString)):
+#         if len(imgString[i]) < 4:
+#             imgString[i] = "0" * (4 - len(imgString[i])) + imgString[i]
+#     if len(imgString)%4 != 0:
+#        imgString = imgString + ["0000"]*(4 - (len(imgString)%4))
+#     return  imgString
+
+# def ConvertImageToStringArray(img):
+#     temp = '\n'.join('\t'.join(hex(x)[2:] for x in y) for y in img)
+#     imgString = temp.split()
+#     print("Image pixles number : " + str(len(imgString)))
+#     for i in range(0, len(imgString)):
+#         if len(imgString[i]) < 2:
+#             imgString[i] = "0" * (2 - len(imgString[i])) + imgString[i]
+#     if len(imgString)%4 != 0:
+#        imgString = imgString + ["00"]*(4 - (len(imgString)%4))
+#     result = []
+#     for i in range(0,len(imgString),2):
+#         result.append(imgString[i]+imgString[i+1])
+#     if len(result)%4 != 0:
+#        result = result + ["0000"]*(4 - (len(result)%4))
+#     return  result
+
 def ConvertImageToStringArray(img):
-    temp = '\n'.join('\t'.join('%0.0f' % x for x in y) for y in img)
-    imgString = temp.split()
+    imgString = []
+    for line in img:
+        for pixel in line:
+            imgString.append(chr(pixel))
     print("Image pixles number : " + str(len(imgString)))
-    for i in range(0, len(imgString)):
-        if len(imgString[i]) < 4:
-            imgString[i] = "0" * (4 - len(imgString[i])) + imgString[i]
-    if len(imgString)%4 != 0:
-       imgString = imgString + ["0000"]*(4 - (len(imgString)%4))
-    return  imgString
+
+    imgString = imgString + ["0"] * (4 - (len(imgString) % 4))
+    result = []
+    for i in range(0,len(imgString),4):
+        result.append(imgString[i]+imgString[i+1] +imgString[i+2]+imgString[i+3]  )
+    if len(result)%4 != 0:
+       result = result + ["0000"]*(4 - (len(result)%4))
+    return  result
+
 
 def DiffeHellman():
   #  return "A WORD IS A WORD"
@@ -106,7 +161,7 @@ def xor_two_str(Mblocks,Cblocks):
 
     return ''.join(xored)
 
-# A method that gets 1 String of lenth 16 chars and convert it to list of 4 block each block 4 chars
+# A method that gets 1 String of length 16 chars and convert it to list of 4 block each block 4 chars
 def StringToBlocks(cipherString):
     cipherBlocks=[]
     cipherBlocks = [cipherString[i:i+4] for i in range(0, len(cipherString), 4)]

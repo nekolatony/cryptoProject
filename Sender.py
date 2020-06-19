@@ -13,8 +13,7 @@ from Communication import *
 import D_H
 from tkinter.filedialog import askopenfilename
 import queue
-
-
+import sys
 HOST, PORT = "localhost", 8000
 
 # the GUI and encrypting thread communcate throug a queue
@@ -33,6 +32,7 @@ def process_queue(root,q,frame,iframe5,img):
         pic1 = tk.PhotoImage(file="Resources/original.png")
         canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
         canvas.image = pic1
+        root.update_idletasks()
 
 
     except Queue.Empty:
@@ -96,10 +96,14 @@ class App(threading.Thread):
         time.sleep(0.1)
 
         k = 0
+        flag = 0
         for i in range(len(self.img)):
             for j in range(len(self.img[0])):
                 cipherImage[i][j] = cipheredPixels[k] % 256
-                k = k + 1
+                flag = flag + 1
+                if flag == 4 :
+                    k = k + 1
+                    flag = 0
 
         self.progress['value'] = 80
         self.root.update_idletasks()

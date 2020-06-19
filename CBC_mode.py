@@ -27,7 +27,7 @@ def CBC_encrypt(message,key):
     blocks = message
     answer = xor_two_str(blocks[0]+blocks[1]+blocks[2]+blocks[3] , "123456789abcdefg")
 
-    orgi,encrypted_block = encrypt(answer, key)
+    orgin,encrypted_block = encrypt(answer, key)
     cipher = list(encrypted_block[0:])
 
     for k in range(4, len(blocks) , 4):
@@ -43,6 +43,8 @@ def CBC_encrypt(message,key):
         cipher.append(encrypted_block[2])
         cipher.append(encrypted_block[3])
         # print("encryption number " + str(k))
+    print("size of cipher = ", len(cipher))
+
     return cipher
 
 
@@ -67,5 +69,8 @@ def CBC_decrypt(message,key):
         orginal.append(answer[8:12])
         orginal.append(answer[12:16])
         # print("decryption number " + str(k))
-    return orginal
+    print("size of orginal = ", len(orginal))
 
+    org = chrListToInt(orginal)
+    # return orginal
+    return  org

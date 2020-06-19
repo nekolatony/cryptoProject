@@ -4,7 +4,7 @@ from helpers import *
 from CBC_mode import *
 import tkinter as tk
 import venv
-import os.path
+import time
 
 def closeWindow(root):
     root.destroy()
@@ -13,8 +13,8 @@ def startDecrypting(root,frame,iframe6,cipherImage,cipheredPixels,orginalPixels,
      print("Original pixels (String): " + str(orginalPixels))
      print("Encrypted pixels (long): " + str(cipheredPixels))
      print("Encrypted pixels (String): " + str(encrypted))
-     enc = []
-     de = deBlocker(cipheredPixels)
+     enc = []                            # list of string blocks
+     de = deBlocker(cipheredPixels)     # string
      for i in range (0,len(de),4):
          enc.append(de[i:i+4])
     # print("deBlocker (String): " +de)
@@ -22,14 +22,16 @@ def startDecrypting(root,frame,iframe6,cipherImage,cipheredPixels,orginalPixels,
      print("Decrypted pixels: "+ str(decryptedM))
      print("Original pixels : " + str(orginalPixels))
 
-     for i in range(0,len(decryptedM)):
-         if decryptedM[i] != orginalPixels[i]:
-             print(decryptedM[i])
+     # for i in range(0,len(decryptedM)):
+     #     if decryptedM[i] != orginalPixels[i]:
+     #         print(decryptedM[i])
 
      k = 0
+     print("size of image     = ",str(len(img)*len(img[0])) )
+     print("size of decrepted = ",len(decryptedM))
      for i in range(len(img)):
          for j in range(len(img[0])):
-             cipherImage[i][j] = int(decryptedM[k],base=10) % 256
+             cipherImage[i][j] = decryptedM[k]
              k = k + 1
          # print(cipherImage)
 
@@ -45,14 +47,19 @@ def startDecrypting(root,frame,iframe6,cipherImage,cipheredPixels,orginalPixels,
      pic1 = tk.PhotoImage(file="Resources/decrypted.png")
      canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
      canvas.image = pic1
-
+     global timer2
+     timer2 = time.perf_counter()
+     print(f"Downloaded the tutorial in {timer2 - timer1:0.4f} seconds")
 
 
 def startEncrypting(root,frame,iframe5,img):
     # img = [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]]
+    global timer1
+    timer1 = time.perf_counter()
 
+    orginalPixels = ConvertImageToStringArray(img)    # string list
+    print("size of orginalPixels = ", len(orginalPixels))
 
-    orginalPixels = ConvertImageToStringArray(img)
     print(len(orginalPixels))
     user1 = venv.DH_Endpoint(197, 151, 199)
     user2 = venv.DH_Endpoint(197, 151, 157)
@@ -68,17 +75,17 @@ def startEncrypting(root,frame,iframe5,img):
     print(orginalPixels)
 
     encrypted = []
-    cipheredPixels = CBC_encrypt(orginalPixels, RCKey)
+    cipheredPixels = CBC_encrypt(orginalPixels, RCKey)   # long
 
-    cipherImage = np.empty([len(img) + 1, len(img[0]) + 1], dtype=int)
+    cipherImage = np.empty([len(img) , len(img[0]) ], dtype=int)    #long/int
 
     k = 0
-    for i in range(len(img)):
-        for j in range(len(img[0])):
-            cipherImage[i][j] = cipheredPixels[k] % 256
-            k = k + 1
-
-    cv2.imwrite('Resources/encrypted.png', cipherImage)
+    # for i in range(len(img)):
+    #     for j in range(len(img[0])):
+    #         cipherImage[i][j] = cipheredPixels[k] % 256
+    #         k = k + 1
+    #
+    # cv2.imwrite('Resources/encrypted.png', cipherImage)
     # B['text'] = 'decrypt'
     # B['command'] = lambda : startDecrypting()
     # pic1['file'] = 'encrypted.png'
@@ -99,7 +106,7 @@ def main():
 
     print("Please enter image url:")
     #url = input()
-    url = "tiger.jpg"
+    url = "Resources/tiger.jpg"
     img = c.imread(url,0)
     #Checking if the img is exist
     if img is None:

@@ -71,7 +71,11 @@ class DHE(object):
         B = pickle.loads(recv_msg(sock))
         return self.update(B)
 
+    def acceptNegotiation(self, sock):
+        B = pickle.loads(recv_msg(sock))
+        send_msg(sock,pickle.dumps(self.getPublicKey()))
+        return self.update(B)
+
 
 def new(*args, **kwargs):
-    """ Return a DHE object """
-    return DHE(*args, **kwargs)
+    return DHE(14)
