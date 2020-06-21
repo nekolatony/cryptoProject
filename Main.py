@@ -1,6 +1,5 @@
-import cv2 as c
+import cv2 as cv2
 import numpy as np
-from helpers import *
 from CBC_mode import *
 import tkinter as tk
 import venv
@@ -106,8 +105,8 @@ def main():
 
     print("Please enter image url:")
     #url = input()
-    url = "Resources/tiger.jpg"
-    img = c.imread(url,0)
+    url = "Resources/1111.jpg"
+    img = cv2.imread(url,0)
     #Checking if the img is exist
     if img is None:
         popupmsg("No photo found!")

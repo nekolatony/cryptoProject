@@ -1,28 +1,29 @@
-import socket
 import pickle
+import queue as Queue
+import socket
 import threading
 import time
-import cv2 as c
-import numpy as np
-from helpers import *
-from CBC_mode import *
-import tkinter as tk
-from tkinter.ttk import *
-import venv
-from Communication import *
-import D_H
 from tkinter.filedialog import askopenfilename
-import queue
-import sys
+from tkinter.ttk import *
+import numpy as np
+import cv2
+
+import D_H
+from CBC_mode import *
+from Communication import *
+
 HOST, PORT = "localhost", 8000
+
+
 
 # the GUI and encrypting thread communcate throug a queue
 # the GUI calls this function once every 100 millisecond to check if the
 #encryption has finished so that it can update the GUI accordingly
-def process_queue(root,q,frame,iframe5,img):
+def process_queue(root,frame,img,q):
     try:
         msg = q.get(0)
-        iframe5.destroy()
+        frame = tk.Frame(root, width=20, height=20, bd=1)
+        frame.place(x= 0,y = 0)
         iframe6 = tk.Frame(frame, bd=2, relief=tk.RAISED)
         iframe6.pack(expand=1, fill=tk.X, pady=10, padx=5)
         B = tk.Button(iframe6, text="Exit", command=lambda: root.destroy()).pack()
@@ -36,7 +37,7 @@ def process_queue(root,q,frame,iframe5,img):
 
 
     except Queue.Empty:
-        root.after(100, process_queue)
+        root.after(100, lambda:process_queue(root,frame,img,q))
 
 # thread class used to encypt the Image so that the GUI does'nt freeze while encrypting
 class App(threading.Thread):
@@ -67,6 +68,7 @@ class App(threading.Thread):
 
 
         self.key = str(self.key)
+
         if len(self.key) < 16:
             self.key = self.key + " " * (16 - len(self.key))
         self.key = self.key[:16]
@@ -127,9 +129,10 @@ class App(threading.Thread):
 #callback funtion to start encrypting
 # uses threading so that the GUI doesn't freeze during encryption
 def startEncrypting(root, frame, iframe5, img, sock, progress,key):
-    q = queue.Queue()
+    q = Queue.Queue()
+
     App(root,q,progress,sock,frame,iframe5,img,key)
-    root.after(100,lambda :process_queue(root,q,frame,iframe5,img))
+    root.after(50,lambda :process_queue(root,frame,img,q))
 
 
 #callback funtion for opining the file chooser
@@ -137,9 +140,9 @@ def OpenPicture(root, frame, iframe5, s,key):
     url = askopenfilename()
     print(url)
     if url.endswith(".png") or url.endswith(".jpg"):
-        img = c.imread(url, 0)
-        c.imwrite("Resources/original.png", img)
-        img = c.imread('Resources/original.png', 0)
+        img = cv2.imread(url, 0)
+        cv2.imwrite("Resources/original.png", img)
+        img = cv2.imread('Resources/original.png', 0)
         url = 'Resources/original.png'
         iframe5.destroy()
 
@@ -174,6 +177,7 @@ def main():
 
         DH = D_H.new(14)       # used diffie hellman to get the key used in the encryption
         key = DH.negotiate(s)   # smeding the public key to the reciever and recieving the public key of the reciever
+
 
         root = tk.Tk()
         root.title("SENDER")

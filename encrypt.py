@@ -3,6 +3,7 @@ from pip._vendor.distlib.compat import raw_input
 
 from helpers import *
 
+
 def encrypt(sentence,s):
     encoded = blockConverter(sentence)
     enlength = len(encoded)

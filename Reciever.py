@@ -1,17 +1,12 @@
-import socket
 import pickle
-import time
-from tkinter.ttk import Progressbar
-import D_H
-import cv2 as c
-import numpy as np
-from helpers import *
-from CBC_mode import *
-import tkinter as tk
-import venv
-from Communication import *
+import socket
 import threading
+import tkinter as tk
+
 import D_H
+from CBC_mode import *
+from Communication import *
+import cv2
 
 HOST, PORT = "localhost", 8000
 
@@ -30,7 +25,7 @@ class App(threading.Thread):
     def run(self):
         cipherImage = pickle.loads(recv_msg(self.sock))
         cipheredPixels = pickle.loads(recv_msg(self.sock))
-        cv2.imwrite("Resources/reciedImage.png", cipherImage)
+        cv2.imwrite("Resources/recivedImagefromServer.png", cipherImage)
         self.iframe6.destroy();
         iframe7 = tk.Frame(self.frame, bd=2, relief=tk.RAISED)
         iframe7.pack(expand=1, fill=tk.X, pady=10, padx=5)
@@ -38,24 +33,24 @@ class App(threading.Thread):
         canvas = tk.Canvas(iframe7, width=len(cipherImage[0]) + 20, height=len(cipherImage) + 20)
         B = tk.Button(iframe7, text="Decrypt",
                       command=lambda: startDecrypting(self.root, self.frame, iframe7, cipherImage, cipheredPixels, self.sock,
-                                                      progress,self.key)).pack()
+                                                      self.key)).pack()
         canvas.pack()
-        pic1 = tk.PhotoImage(file="Resources/reciedImage.png")
+        pic1 = tk.PhotoImage(file="Resources/recivedImagefromServer.png")
         canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
         canvas.image = pic1
-        progress = Progressbar(iframe7, orient=tk.HORIZONTAL,
-                               length=100, mode='determinate')
-        progress.pack(pady=10)
+        # progress = Progressbar(iframe7, orient=tk.HORIZONTAL,
+        #                        length=100, mode='determinate')
+        # progress.pack(pady=10)
 
 # callback fuction to decrypt the Image
-def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,progress,key):
-    progress['value'] = 10
-    root.update_idletasks()
-    time.sleep(0.2)
-
-    progress['value'] = 20
-    root.update_idletasks()
-    time.sleep(0.1)
+def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,key):
+    # progress['value'] = 10
+    # root.update_idletasks()
+    # time.sleep(0.2)
+    #
+    # progress['value'] = 20
+    # root.update_idletasks()
+    # time.sleep(0.1)
 
 
     key = str(key)
@@ -63,9 +58,9 @@ def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,progress
         key = key + " " * (16 - len(key))
     key = key[:16]
     RCKey = generateKey(key)
-    progress['value'] = 30
-    root.update_idletasks()
-    time.sleep(0.1)
+    # progress['value'] = 30
+    # root.update_idletasks()
+    # time.sleep(0.1)
 
     enc = []
     de = deBlocker(cipheredPixels)
@@ -73,31 +68,32 @@ def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,progress
         enc.append(de[i:i + 4])
     # print("deBlocker (String): " +de)
 
-    progress['value'] = 40
-    root.update_idletasks()
-    time.sleep(0.1)
-    progress['value'] = 60
-    root.update_idletasks()
-    time.sleep(0.1)
+    # progress['value'] = 40
+    # root.update_idletasks()
+    # time.sleep(0.1)
+    # progress['value'] = 60
+    # root.update_idletasks()
+    # time.sleep(0.1)
 
     decryptedM = CBC_decrypt(enc, RCKey)
 
     print('len decrypted ' + str(len(decryptedM)))
 
     k = 0
-    print(len(cipherImage)* len(cipherImage[0]))
     for i in range(len(cipherImage)):
         for j in range(len(cipherImage[0])):
-                cipherImage[i][j] = int(decryptedM[k], base=10) % 256
-                k = k + 1
-        # print(cipherImage)
-    progress['value'] = 80
-    root.update_idletasks()
-    time.sleep(0.1)
+            # cipherImage[i][j] = int(decryptedM[k], base=10) % 256
+            cipherImage[i][j] = decryptedM[k]
+            k = k + 1
+
+    # print(cipherImage)
+    # progress['value'] = 80
+    # root.update_idletasks()
+    # time.sleep(0.1)
     cv2.imwrite('Resources/Recieverdecrypted.png', cipherImage)
-    progress['value'] = 100
-    root.update_idletasks()
-    time.sleep(0.1)
+    # progress['value'] = 100
+    # root.update_idletasks()
+    # time.sleep(0.1)
 
     iframe6.destroy()
     iframe7 = tk.Frame(frame, bd=2, relief=tk.RAISED)

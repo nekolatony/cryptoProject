@@ -1,14 +1,10 @@
-import cv2 as c
-import numpy as np
-from helpers import *
-from CBC_mode import *
-import tkinter as tk
-import venv
-from Communication import *
-import struct
-import socket
 import pickle
-
+import socket
+import numpy as np
+import D_H
+from CBC_mode import *
+from Communication import *
+import cv2
 HOST, PORT = "localhost", 8000
 
 # a server class used to connect the sender and the receiver
@@ -35,19 +31,80 @@ def main():
                 reciever = client1
             while True:
 
-                SenderPublicKey = recv_msg(sender)
-                RecieverPublicKey = recv_msg(reciever)
-                send_msg(reciever,SenderPublicKey)
-                send_msg(sender,RecieverPublicKey)
+                # SenderPublicKey = recv_msg(sender)
+                DH = D_H.new(14)  # used diffie hellman to get the key used in the encryption
+                # Senderkey= pickle.loads(recv_msg(sender))
 
-                print(pickle.loads(SenderPublicKey))
-                print(pickle.loads(RecieverPublicKey))
 
-                cipherImage = recv_msg(sender)
-                cipherdPixels =recv_msg(sender)
-                send_msg(reciever,cipherImage)
-                send_msg(reciever,cipherdPixels)
+                # Senderkey = pickle.loads(recv_msg(sender))
+                Senderkey =str(DH.acceptNegotiation(sender))  # smeding the public key to the reciever and recieving the public key of the reciever
+                Senderkey = Senderkey[:16]
+                RCsenderKey = generateKey(Senderkey)
 
+                print(Senderkey)
+
+                # RecieverPublicKey = recv_msg(reciever)
+                DH = D_H.new(14)  # used diffie hellman to get the key used in the encryption
+                # Recieverkey = pickle.loads(recv_msg(reciever))
+
+                Recieverkey =str(DH.acceptNegotiation(reciever))  # smeding the public key to the reciever and recieving the public key of the reciever
+                Recieverkey = Recieverkey[:16]
+                RCrecieverKey = generateKey(Recieverkey)
+
+                print(Recieverkey)
+
+                # send_msg(reciever,SenderPublicKey)
+                # send_msg(sender,RecieverPublicKey)
+
+
+                cipherImage = pickle.loads(recv_msg(sender))
+                cipherdPixels =pickle.loads(recv_msg(sender))
+
+                #decrypting image
+
+                enc = []
+                de = deBlocker(cipherdPixels)
+                for i in range(0, len(de), 4):
+                    enc.append(de[i:i + 4])
+                # print("deBlocker (String): " +de)
+                print(enc)
+                decryptedM = CBC_decrypt(enc, RCsenderKey)
+                cipherImage1 = np.empty([len(cipherImage), len(cipherImage[0])], dtype=int)
+
+                k = 0
+                for i in range(len(cipherImage1)):
+                    for j in range(len(cipherImage1[0])):
+                        # cipherImage[i][j] = int(decryptedM[k], base=10) % 256
+                        cipherImage1[i][j] = decryptedM[k]
+                        k = k + 1
+
+                cv2.imwrite('Resources/Serverdecrypted.png', cipherImage1)
+
+
+                # encrypting with the reiever key
+
+                orginalPixels = ConvertImageToStringArray(cipherImage1)
+
+
+
+                cipheredPixel = CBC_encrypt(orginalPixels, RCrecieverKey)
+
+                img = np.empty([len(cipherImage) , len(cipherImage[0]) ], dtype=int)
+
+                k = 0
+                flag = 0
+                for i in range(len(cipherImage)):
+                    for j in range(len(cipherImage[0])):
+                        img[i][j] = cipheredPixel[k] % 256
+                        flag = flag + 1
+                        if flag == 4:
+                            k = k + 1
+                            flag = 0
+
+                cv2.imwrite('Resources/Serverencrypted.png', img)
+
+                send_msg(reciever, pickle.dumps(img))
+                send_msg(reciever, pickle.dumps(cipheredPixel))
 
 
 if __name__ == "__main__":

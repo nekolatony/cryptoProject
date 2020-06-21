@@ -1,8 +1,10 @@
+import sys
+
 from numpy import long
 from pip._vendor.distlib.compat import raw_input
 
 from helpers import *
-import sys
+
 
 def decrypt(esentence,s):
     encoded = blockConverter(esentence[0] + esentence[1] + esentence[2] + esentence[3])
