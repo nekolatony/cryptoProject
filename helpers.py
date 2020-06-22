@@ -49,9 +49,8 @@ def deBlocker(blocks):
 
 #generate key s[0... 2r+3] from given input string userkey
 def generateKey(userkey):
-    r=20
+    r=10
     w=32
-    b=len(userkey)
     modulo = 2**32
     s=(2*r+4)*[0]
     s[0]=0xB7E15163
