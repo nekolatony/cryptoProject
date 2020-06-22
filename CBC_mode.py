@@ -11,7 +11,7 @@ def CBC_encrypt(message,key):
     words = message
     xoredBlock = xor_two_str(words[0]+words[1]+words[2]+words[3] , IV)
 
-    orgin,encrypted_block = encrypt(xoredBlock, key)
+    orgin,encrypted_block = encrypt(xoredBlock, key)    # cr6
     cipherMessage = list(encrypted_block[0:])
 
     for k in range(4, len(words) , 4):   # xor each block with the prev encrypted block and ecrypt it and save it to cipherMessage
@@ -50,6 +50,6 @@ def CBC_decrypt(cipher, key):
         # print("decryption number " + str(k))
     print("size of orginal = ", len(orginal))
 
-    orginalMessage = chrListToInt(orginal)
+    # orginalMessage = chrListToInt(orginal)
     # return orginal
-    return  orginalMessage
+    return  orginal

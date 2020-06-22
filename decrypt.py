@@ -18,7 +18,7 @@ def decrypt(encryptedBlock, key):
     cipher.append(B)
     cipher.append(C)
     cipher.append(D)
-    r=12
+    r=20
     w=32
     modulo = 2**32
     lgw = 5

@@ -20,8 +20,8 @@ def ROR(x, n, bits = 32):
 def ROL(x, n, bits = 32):
     return ROR(x, bits - n,bits)
 
-#convert input sentence into blocks of binary
-#creates 4 blocks of binary each of 32 bits.
+#convert input sentence into words of binary
+#creates 4 words of binary each of 32 bits.
 def blockConverter(sentence):
     encoded = []
     res = ""
@@ -30,7 +30,7 @@ def blockConverter(sentence):
             encoded.append(res)
             res = ""
         temp = bin(ord(sentence[i]))[2:]
-        if len(temp) <8:
+        if len(temp) < 8:
             temp = "0"*(8-len(temp)) + temp
         res = res + temp
     encoded.append(res)
@@ -49,7 +49,7 @@ def deBlocker(blocks):
 
 #generate key s[0... 2r+3] from given input string userkey
 def generateKey(userkey):
-    r=12
+    r=20
     w=32
     b=len(userkey)
     modulo = 2**32
@@ -98,31 +98,31 @@ def chrListToInt(lst):
         return result
 
     #A method that gets an img matrix and convert it to a string list each elemnt size of 32bit
-# def ConvertImageToStringArray(img):
-#     temp = '\n'.join('\t'.join('%0.0f' % x for x in y) for y in img)
-#     imgString = temp.split()
-#     print("Image pixles number : " + str(len(imgString)))
-#     for i in range(0, len(imgString)):
-#         if len(imgString[i]) < 4:
-#             imgString[i] = "0" * (4 - len(imgString[i])) + imgString[i]
-#     if len(imgString)%4 != 0:
-#        imgString = imgString + ["0000"]*(4 - (len(imgString)%4))
-#     return  imgString
-
 def ConvertImageToStringArray(img):
-    imgStringList = []
-    for line in img:
-        for pixel in line:
-            imgStringList.append(chr(pixel))
-    print("Image pixles number : " + str(len(imgStringList)))
+    temp = '\n'.join('\t'.join('%d' % x for x in y) for y in img)
+    imgString = temp.split()
+    print("Image pixles number : " + str(len(imgString)))
+    for i in range(0, len(imgString)):
+        if len(imgString[i]) < 4:
+            imgString[i] = "0" * (4 - len(imgString[i])) + imgString[i]
+    if len(imgString)%4 != 0:
+       imgString = imgString + ["0000"]*(4 - (len(imgString)%4))
+    return  imgString
 
-    imgStringList = imgStringList + ["0"] * (4 - (len(imgStringList) % 4))
-    result = []
-    for i in range(0,len(imgStringList),4):
-        result.append(imgStringList[i]+imgStringList[i+1] +imgStringList[i+2]+imgStringList[i+3]  )
-    if len(result)%4 != 0:
-       result = result + ["0000"]*(4 - (len(result)%4))
-    return  result
+# def ConvertImageToStringArray(img):
+#     imgStringList = []    # [255,34,56,234,334]  => [p,x,t,e,w,0,0,0] => [pxte,w000,0000,0000]
+#     for line in img:
+#         for pixel in line:
+#             imgStringList.append(chr(pixel))
+#     print("Image pixles number : " + str(len(imgStringList)))
+#
+#     imgStringList = imgStringList + ["0"] * (4 - (len(imgStringList) % 4))   # padding for word
+#     result = []
+#     for i in range(0,len(imgStringList),4):
+#         result.append(imgStringList[i]+imgStringList[i+1] +imgStringList[i+2]+imgStringList[i+3]  )
+#     if len(result)%4 != 0:
+#        result = result + ["0000"]*(4 - (len(result)%4))     # padding for block
+#     return  result
 
 
 def DiffeHellman():

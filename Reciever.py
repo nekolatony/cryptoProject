@@ -38,42 +38,22 @@ class App(threading.Thread):
         pic1 = tk.PhotoImage(file="Resources/recivedImagefromServer.png")
         canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
         canvas.image = pic1
-        # progress = Progressbar(iframe7, orient=tk.HORIZONTAL,
-        #                        length=100, mode='determinate')
-        # progress.pack(pady=10)
+
 
 # callback fuction to decrypt the Image
 def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,key):
-    # progress['value'] = 10
-    # root.update_idletasks()
-    # time.sleep(0.2)
-    #
-    # progress['value'] = 20
-    # root.update_idletasks()
-    # time.sleep(0.1)
-
 
     key = str(key)
     if len(key) < 16:
         key = key + " " * (16 - len(key))
     key = key[:16]
     RCKey = generateKey(key)
-    # progress['value'] = 30
-    # root.update_idletasks()
-    # time.sleep(0.1)
 
     enc = []
     de = deBlocker(cipheredPixels)
     for i in range(0, len(de), 4):
         enc.append(de[i:i + 4])
-    # print("deBlocker (String): " +de)
 
-    # progress['value'] = 40
-    # root.update_idletasks()
-    # time.sleep(0.1)
-    # progress['value'] = 60
-    # root.update_idletasks()
-    # time.sleep(0.1)
 
     decryptedM = CBC_decrypt(enc, RCKey)
 
@@ -82,18 +62,11 @@ def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,key):
     k = 0
     for i in range(len(cipherImage)):
         for j in range(len(cipherImage[0])):
-            # cipherImage[i][j] = int(decryptedM[k], base=10) % 256
             cipherImage[i][j] = decryptedM[k]
             k = k + 1
 
-    # print(cipherImage)
-    # progress['value'] = 80
-    # root.update_idletasks()
-    # time.sleep(0.1)
+
     cv2.imwrite('Resources/Recieverdecrypted.png', cipherImage)
-    # progress['value'] = 100
-    # root.update_idletasks()
-    # time.sleep(0.1)
 
     iframe6.destroy()
     iframe7 = tk.Frame(frame, bd=2, relief=tk.RAISED)

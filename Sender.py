@@ -58,13 +58,6 @@ class App(threading.Thread):
     def run(self):
         orginalPixels = ConvertImageToStringArray(self.img)
         print(len(orginalPixels))
-        # user1 = venv.DH_Endpoint(197, 151, 199)
-        # user2 = venv.DH_Endpoint(197, 151, 157)
-        # alicePartialKey = user1.generate_partial_key()
-        # bobPartialKey = user2.generate_partial_key()
-        # key = user1.generate_full_key(alicePartialKey)
-        # key = user2.generate_full_key(bobPartialKey)
-
 
 
         self.key = str(self.key)

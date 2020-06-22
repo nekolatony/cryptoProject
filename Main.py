@@ -26,7 +26,7 @@ def startDecrypting(root, container, innerContainer, cipherImg, cipheredPixels, 
      print("size of decrepted = ",len(decryptedImgArray))
      for i in range(len(imgMatrix)):
          for j in range(len(imgMatrix[0])):
-             decryptedImg[i][j] = decryptedImgArray[k]
+             decryptedImg[i][j] = int(decryptedImgArray[k])
              k = k + 1
          # print(cipherImage)
 
@@ -56,13 +56,12 @@ def startEncrypting(root, container, innerContainer, imageMatrix):   # takes a p
     key = user1.generate_full_key(alicePartialKey)
     key = user2.generate_full_key(bobPartialKey)
     key = str(key)
-    if len(key) < 16:
+    if len(key) < 16:             # complete the key to 128bit
         key = key + " " * (16 - len(key))
     key = key[:16]
     RCKey = generateKey(key)
     print(orginalPixels)
 
-    encrypted = []
     cipheredPixels = CBC_encrypt(orginalPixels, RCKey)   # list of long  //  0.25 the length of the image
 
     cipherImage = np.empty([len(imageMatrix) , len(imageMatrix[0])], dtype=int)    #long/int
@@ -71,11 +70,9 @@ def startEncrypting(root, container, innerContainer, imageMatrix):   # takes a p
     flag = 0
     for i in range(len(cipherImage)):
         for j in range(len(cipherImage[0])):
-            cipherImage[i][j] = cipheredPixels[k] % 256
+            cipherImage[i][j] = cipheredPixels[k] % 256              #  [48,49,51,52]  =>  [a,b,d,e]
             flag = flag + 1
-            if flag == 4:
-                k = k + 1
-                flag = 0
+            k = k + 1
     cv2.imwrite('Resources/encrypted.png', cipherImage)
 
 
@@ -94,7 +91,7 @@ def startEncrypting(root, container, innerContainer, imageMatrix):   # takes a p
 def main():
 
     print("Please enter image url:")     # getting the image,checking its type and saving it in .png format
-    url = "Resources/tiger.jpg"
+    url = "Resources/five.png"
     img = cv2.imread(url,0)
     if img is None:        #Checking if the img is exist
         popupmsg("No photo found!")
