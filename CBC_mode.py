@@ -1,71 +1,55 @@
-
 from encrypt import *
 from decrypt import *
 from helpers import *
 
 
+IV = "123456789abcdefg"
 
-def convertToBin(message):
-    block = []
-    for pixel in message:
-        tmp = ""
-        for digit in pixel:
-            tmp = bin(int(digit))[2:]
-            tmp = "0" * (8 - len(tmp)) + tmp
-        block.append(tmp)
-    for i in range(len(block) % 4):
-        block.append('0' * 8)
-    return block
 
 #Key add (CBC takes a key to perform encryption)
 def CBC_encrypt(message,key):
-    blocks = message
-    answer = xor_two_str(blocks[0]+blocks[1]+blocks[2]+blocks[3] , "123456789abcdefg")
+    words = message
+    xoredBlock = xor_two_str(words[0]+words[1]+words[2]+words[3] , IV)
 
-    orgin,encrypted_block = encrypt(answer, key)
-    cipher = list(encrypted_block[0:])
+    orgin,encrypted_block = encrypt(xoredBlock, key)
+    cipherMessage = list(encrypted_block[0:])
 
-    for k in range(4, len(blocks) , 4):
-        #eCipher = deBlocker(cipher)
-        #cipherBlocks = StringToBlocks(eCipher)
-        answer = xor_two_str(blocks[k] + blocks[k+1] + blocks[k+2] + blocks[k+3], deBlocker(encrypted_block))
+    for k in range(4, len(words) , 4):   # xor each block with the prev encrypted block and ecrypt it and save it to cipherMessage
+        xoredBlock = xor_two_str(words[k] + words[k+1] + words[k+2] + words[k+3], deBlocker(encrypted_block))
 
-        #answer = xor_two_str(blocks[k] + blocks[k + 1] + blocks[k + 2] + blocks[k + 3], "123456789abcdefg")
 
-        orgi,encrypted_block = encrypt(answer, key)
-        cipher.append(encrypted_block[0])
-        cipher.append(encrypted_block[1])
-        cipher.append(encrypted_block[2])
-        cipher.append(encrypted_block[3])
+        orgi,encrypted_block = encrypt(xoredBlock, key)
+        cipherMessage.append(encrypted_block[0])
+        cipherMessage.append(encrypted_block[1])
+        cipherMessage.append(encrypted_block[2])
+        cipherMessage.append(encrypted_block[3])
         # print("encryption number " + str(k))
-    print("size of cipher = ", len(cipher))
+    print("size of cipherMessage = ", len(cipherMessage))
 
-    return cipher
+    return cipherMessage    # list of long
 
 
 
 #Key add (CBC takes a key to perform decryption)
-def CBC_decrypt(message,key):
-    blocks = message
+def CBC_decrypt(cipher, key):
+    words = cipher
     print("********************************DECRYPTING*********************************")
-    orgi,decrypted_block = decrypt((blocks[0:4]), key)
-    answer = xor_two_str(deBlocker(decrypted_block), "123456789abcdefg")
-    orginal = [answer[:4],answer[4:8],answer[8:12],answer[12:16]]
+    orgi,decrypted_block = decrypt((words[0:4]), key)
 
-    for k in range(4, len(blocks) , 4):
-        orgi,decrypted_block = decrypt((blocks[k:k + 4]), key)
-        answer = xor_two_str(blocks[k-4]+ blocks[k-3] + blocks[k-2] + blocks[k-1], deBlocker(decrypted_block))
-        #answer = xor_two_str("1234567891234567", deBlocker(decrypted_block))
+    unXoredBlock = xor_two_str(deBlocker(decrypted_block), IV)
+    orginal = [unXoredBlock[:4],unXoredBlock[4:8],unXoredBlock[8:12],unXoredBlock[12:16]]
 
-        print("[",k,"] answer ",answer)
-        print(answer[:4]," ",answer[4:8]," " ,answer[8:12]," ",answer[12:16])
-        orginal.append(answer[:4])
-        orginal.append(answer[4:8])
-        orginal.append(answer[8:12])
-        orginal.append(answer[12:16])
+    for k in range(4, len(words) , 4):
+        orgi,decrypted_block = decrypt((words[k:k + 4]), key)
+        unXoredBlock = xor_two_str(words[k-4]+ words[k-3] + words[k-2] + words[k-1], deBlocker(decrypted_block))
+
+        orginal.append(unXoredBlock[:4])
+        orginal.append(unXoredBlock[4:8])
+        orginal.append(unXoredBlock[8:12])
+        orginal.append(unXoredBlock[12:16])
         # print("decryption number " + str(k))
     print("size of orginal = ", len(orginal))
 
-    org = chrListToInt(orginal)
+    orginalMessage = chrListToInt(orginal)
     # return orginal
-    return  org
+    return  orginalMessage

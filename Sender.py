@@ -176,7 +176,7 @@ def main():
         send_msg(s,pickle.dumps('sender'))   # the sender announces himself to the server
 
         DH = D_H.new(14)       # used diffie hellman to get the key used in the encryption
-        key = DH.negotiate(s)   # smeding the public key to the reciever and recieving the public key of the reciever
+        key = DH.negotiate(s)   # sending the public key to the reciever and recieving the public key of the reciever
 
 
         root = tk.Tk()

@@ -8,58 +8,47 @@ import time
 def closeWindow(root):
     root.destroy()
 
-def startDecrypting(root,frame,iframe6,cipherImage,cipheredPixels,orginalPixels,encrypted,RCKey,img):
-     print("Original pixels (String): " + str(orginalPixels))
+def startDecrypting(root, container, innerContainer, cipherImg, cipheredPixels, RCKey, imgMatrix):
      print("Encrypted pixels (long): " + str(cipheredPixels))
-     print("Encrypted pixels (String): " + str(encrypted))
-     enc = []                            # list of string blocks
-     de = deBlocker(cipheredPixels)     # string
-     for i in range (0,len(de),4):
-         enc.append(de[i:i+4])
-    # print("deBlocker (String): " +de)
-     decryptedM =  CBC_decrypt(enc,RCKey)
-     print("Decrypted pixels: "+ str(decryptedM))
-     print("Original pixels : " + str(orginalPixels))
 
-     # for i in range(0,len(decryptedM)):
-     #     if decryptedM[i] != orginalPixels[i]:
-     #         print(decryptedM[i])
+     encryptedWords = []                            # list of string words
+     de = deBlocker(cipheredPixels)      # string
+     for i in range (0,len(de),4):
+         encryptedWords.append(de[i:i+4])
+
+     decryptedImgArray =  CBC_decrypt(encryptedWords,RCKey)
+     print("Decrypted pixels: "+ str(decryptedImgArray))
+
+     decryptedImg = np.empty([len(cipherImg), len(cipherImg[0])], dtype=int)  # long/int
 
      k = 0
-     print("size of image     = ",str(len(img)*len(img[0])) )
-     print("size of decrepted = ",len(decryptedM))
-     for i in range(len(img)):
-         for j in range(len(img[0])):
-             cipherImage[i][j] = decryptedM[k]
+     print("size of image     = ", str(len(imgMatrix) * len(imgMatrix[0])))
+     print("size of decrepted = ",len(decryptedImgArray))
+     for i in range(len(imgMatrix)):
+         for j in range(len(imgMatrix[0])):
+             decryptedImg[i][j] = decryptedImgArray[k]
              k = k + 1
          # print(cipherImage)
 
-     cv2.imwrite('Resources/decrypted.png', cipherImage)
+     cv2.imwrite('Resources/decrypted.png', decryptedImg)     # saving decrypted image
 
-     iframe6.destroy()
-     iframe7 = tk.Frame(frame, bd=2, relief=tk.RAISED)
-     iframe7.pack(expand=1, fill=tk.X, pady=10, padx=5)
-     label = tk.Label(iframe7, text='Decrypted Image').pack()
-     canvas = tk.Canvas(iframe7, width=len(img[0]) + 20, height=len(img) + 20)
-     B = tk.Button(iframe7, text="Exit",command = lambda :closeWindow(root)).pack()
+     innerContainer.destroy()
+     newInnerContainer = tk.Frame(container, bd=2, relief=tk.RAISED)
+     newInnerContainer.pack(expand=1, fill=tk.X, pady=10, padx=5)
+     label = tk.Label(newInnerContainer, text='Decrypted Image').pack()
+     canvas = tk.Canvas(newInnerContainer, width=len(imgMatrix[0]) + 20, height=len(imgMatrix) + 20)
+     B = tk.Button(newInnerContainer, text="Exit",command = lambda :closeWindow(root)).pack()
      canvas.pack()
-     pic1 = tk.PhotoImage(file="Resources/decrypted.png")
-     canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
-     canvas.image = pic1
-     global timer2
-     timer2 = time.perf_counter()
-     print(f"Downloaded the tutorial in {timer2 - timer1:0.4f} seconds")
+     decryptedPic = tk.PhotoImage(file="Resources/decrypted.png")
+     canvas.create_image(5, 5, anchor=tk.NW, image=decryptedPic)
+     canvas.image = decryptedPic
 
 
-def startEncrypting(root,frame,iframe5,img):
-    # img = [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]]
-    global timer1
-    timer1 = time.perf_counter()
+def startEncrypting(root, container, innerContainer, imageMatrix):   # takes a photo as input and encrypts it with cr6 with CBC mode
 
-    orginalPixels = ConvertImageToStringArray(img)    # string list
+    orginalPixels = ConvertImageToStringArray(imageMatrix)    # list of string , each slot is a word of 4 chars ( 4 words = block)
     print("size of orginalPixels = ", len(orginalPixels))
 
-    print(len(orginalPixels))
     user1 = venv.DH_Endpoint(197, 151, 199)
     user2 = venv.DH_Endpoint(197, 151, 157)
     alicePartialKey = user1.generate_partial_key()
@@ -74,57 +63,56 @@ def startEncrypting(root,frame,iframe5,img):
     print(orginalPixels)
 
     encrypted = []
-    cipheredPixels = CBC_encrypt(orginalPixels, RCKey)   # long
+    cipheredPixels = CBC_encrypt(orginalPixels, RCKey)   # list of long  //  0.25 the length of the image
 
-    cipherImage = np.empty([len(img) , len(img[0]) ], dtype=int)    #long/int
+    cipherImage = np.empty([len(imageMatrix) , len(imageMatrix[0])], dtype=int)    #long/int
 
     k = 0
-    # for i in range(len(img)):
-    #     for j in range(len(img[0])):
-    #         cipherImage[i][j] = cipheredPixels[k] % 256
-    #         k = k + 1
-    #
-    # cv2.imwrite('Resources/encrypted.png', cipherImage)
-    # B['text'] = 'decrypt'
-    # B['command'] = lambda : startDecrypting()
-    # pic1['file'] = 'encrypted.png'
-    # label['text'] = 'Encrypted pic'
-    iframe5.destroy()
-    iframe6 = tk.Frame(frame, bd=2, relief=tk.RAISED)
-    iframe6.pack( expand=1, fill=tk.X, pady=10, padx=5)
-    label = tk.Label(iframe6, text='Encrypted Image').pack()
-    canvas = tk.Canvas(iframe6, width=len(img[0]) + 20, height=len(img) + 20)
-    B = tk.Button(iframe6,bg = '#85D426',fg = '#e0163b', text="Decrypt", command=lambda: startDecrypting(root,frame,iframe6,cipherImage,cipheredPixels,orginalPixels,encrypted,RCKey,img)).pack()
+    flag = 0
+    for i in range(len(cipherImage)):
+        for j in range(len(cipherImage[0])):
+            cipherImage[i][j] = cipheredPixels[k] % 256
+            flag = flag + 1
+            if flag == 4:
+                k = k + 1
+                flag = 0
+    cv2.imwrite('Resources/encrypted.png', cipherImage)
+
+
+    innerContainer.destroy()
+    newInnerContainer = tk.Frame(container, bd=2, relief=tk.RAISED)
+    newInnerContainer.pack( expand=1, fill=tk.X, pady=10, padx=5)
+    label = tk.Label(newInnerContainer, text='Encrypted Image').pack()
+    canvas = tk.Canvas(newInnerContainer, width=len(imageMatrix[0]) + 20, height=len(imageMatrix) + 20)
+    B = tk.Button(newInnerContainer, bg = '#85D426', fg = '#e0163b', text="Decrypt", command=lambda: startDecrypting(root, container, newInnerContainer, cipherImage, cipheredPixels, RCKey, imageMatrix)).pack()
     canvas.pack()
-    pic1 = tk.PhotoImage(file="Resources/encrypted.png")
-    canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
-    canvas.image = pic1
+    encryptedPic = tk.PhotoImage(file="Resources/encrypted.png")
+    canvas.create_image(5, 5, anchor=tk.NW, image=encryptedPic)
+    canvas.image = encryptedPic
 
 
 def main():
 
-    print("Please enter image url:")
-    #url = input()
-    url = "Resources/1111.jpg"
+    print("Please enter image url:")     # getting the image,checking its type and saving it in .png format
+    url = "Resources/tiger.jpg"
     img = cv2.imread(url,0)
-    #Checking if the img is exist
-    if img is None:
+    if img is None:        #Checking if the img is exist
         popupmsg("No photo found!")
         return;
-    cv2.imwrite('Resources/1111.png', img)
+    cv2.imwrite('Resources/activePhoto.png', img)
 
-    root = tk.Tk()
-    frame = tk.Frame(root, width=len(img[0]) + 20, height=len(img) + 20, bd=1)
-    frame.pack()
+    root = tk.Tk()                                   # starting gui and opening the image to decrypt
+    container = tk.Frame(root, width=len(img[0]) + 20, height=len(img) + 20, bd=1)
+    container.pack()
 
-    iframe5 = tk.Frame(frame, bd=2, relief=tk.RAISED)
-    iframe5.pack( expand=1, fill=tk.X, pady=10, padx=5)
-    label = tk.Label(iframe5, text='Orginal Image').pack()
-    canvas = tk.Canvas(iframe5, width=len(img[0]) + 20, height=len(img) + 20)
-    B = tk.Button(iframe5,fg = '#85D426',bg = '#e0163b' ,text="Encrypt", command=lambda: startEncrypting(root,frame,iframe5,img)).pack()
+    innerContainer = tk.Frame(container, bd=2, relief=tk.RAISED)
+    innerContainer.pack( expand=1, fill=tk.X, pady=10, padx=5)
+    label = tk.Label(innerContainer, text='Orginal Image').pack()
+    canvas = tk.Canvas(innerContainer, width=len(img[0]) + 20, height=len(img) + 20)
+    button = tk.Button(innerContainer,fg = '#85D426',bg = '#e0163b' ,text="Encrypt", command=lambda: startEncrypting(root,container,innerContainer,img)).pack()
     canvas.pack()
-    pic1 = tk.PhotoImage(file="Resources/1111.png")
-    canvas.create_image(5, 5, anchor=tk.NW, image=pic1)
+    orginalPic = tk.PhotoImage(file="Resources/activePhoto.png")
+    canvas.create_image(5, 5, anchor=tk.NW, image=orginalPic)
 
 
 

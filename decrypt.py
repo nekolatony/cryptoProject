@@ -6,8 +6,8 @@ from pip._vendor.distlib.compat import raw_input
 from helpers import *
 
 
-def decrypt(esentence,s):
-    encoded = blockConverter(esentence[0] + esentence[1] + esentence[2] + esentence[3])
+def decrypt(encryptedBlock, key):
+    encoded = blockConverter(encryptedBlock[0] + encryptedBlock[1] + encryptedBlock[2] + encryptedBlock[3])
     enlength = len(encoded)
     A = long(encoded[0],2)
     B = long(encoded[1],2)
@@ -22,8 +22,8 @@ def decrypt(esentence,s):
     w=32
     modulo = 2**32
     lgw = 5
-    C = (C - s[2*r+3])%modulo
-    A = (A - s[2*r+2])%modulo
+    C = (C - key[2 * r + 3]) % modulo
+    A = (A - key[2 * r + 2]) % modulo
     for j in range(1,r+1):
         i = r+1-j
         (A, B, C, D) = (D, A, B, C)
@@ -33,10 +33,10 @@ def decrypt(esentence,s):
         t = ROL(t_temp,lgw,32)
         tmod=t%32
         umod=u%32
-        C = (ROR((C-s[2*i+1])%modulo,tmod,32)  ^u)  
-        A = (ROR((A-s[2*i])%modulo,umod,32)   ^t) 
-    D = (D - s[1])%modulo 
-    B = (B - s[0])%modulo
+        C = (ROR((C - key[2 * i + 1]) % modulo, tmod, 32) ^ u)
+        A = (ROR((A - key[2 * i]) % modulo, umod, 32) ^ t)
+    D = (D - key[1]) % modulo
+    B = (B - key[0]) % modulo
     orgi = []
     orgi.append(A)
     orgi.append(B)

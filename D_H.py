@@ -36,21 +36,14 @@ class DHE(object):
             self.g = groups[group][0]
             self.p = groups[group][1]
 
-        elif isinstance(group, (list,tuple)):
-            self.g = group[0]
-            self.p = group[1]
-
-        elif isinstance(group, dict):
-            self.g = group['g']
-            self.p = group['p']
-
         else:
-            raise TypeError("{} is not an int, list, tuple, or dict"
+            raise TypeError("{} is not an int"
             .format(group))
 
-        self.a = secrets.randbelow(self.p -1)
+        self.a = secrets.randbelow(self.p - 1)
         self.public = pow(self.g, self.a, self.p)  # g**a % p
         self.key = 0
+
 
     def getPublicKey(self):
         return self.public
