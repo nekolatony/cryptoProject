@@ -109,26 +109,6 @@ def ConvertImageToStringArray(img):
        imgString = imgString + ["0000"]*(4 - (len(imgString)%4))
     return  imgString
 
-# def ConvertImageToStringArray(img):
-#     imgStringList = []    # [255,34,56,234,334]  => [p,x,t,e,w,0,0,0] => [pxte,w000,0000,0000]
-#     for line in img:
-#         for pixel in line:
-#             imgStringList.append(chr(pixel))
-#     print("Image pixles number : " + str(len(imgStringList)))
-#
-#     imgStringList = imgStringList + ["0"] * (4 - (len(imgStringList) % 4))   # padding for word
-#     result = []
-#     for i in range(0,len(imgStringList),4):
-#         result.append(imgStringList[i]+imgStringList[i+1] +imgStringList[i+2]+imgStringList[i+3]  )
-#     if len(result)%4 != 0:
-#        result = result + ["0000"]*(4 - (len(result)%4))     # padding for block
-#     return  result
-
-
-def DiffeHellman():
-  #  return "A WORD IS A WORD"
-    return  '1234123412341234'
-
 
 def xor_two_str(Mblocks,Cblocks):
     xored = []

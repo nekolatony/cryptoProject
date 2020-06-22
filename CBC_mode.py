@@ -50,6 +50,4 @@ def CBC_decrypt(cipher, key):
         # print("decryption number " + str(k))
     print("size of orginal = ", len(orginal))
 
-    # orginalMessage = chrListToInt(orginal)
-    # return orginal
     return  orginal

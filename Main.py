@@ -67,11 +67,9 @@ def startEncrypting(root, container, innerContainer, imageMatrix):   # takes a p
     cipherImage = np.empty([len(imageMatrix) , len(imageMatrix[0])], dtype=int)    #long/int
 
     k = 0
-    flag = 0
     for i in range(len(cipherImage)):
         for j in range(len(cipherImage[0])):
-            cipherImage[i][j] = cipheredPixels[k] % 256              #  [48,49,51,52]  =>  [a,b,d,e]
-            flag = flag + 1
+            cipherImage[i][j] = cipheredPixels[k] % 256
             k = k + 1
     cv2.imwrite('Resources/encrypted.png', cipherImage)
 
@@ -91,7 +89,7 @@ def startEncrypting(root, container, innerContainer, imageMatrix):   # takes a p
 def main():
 
     print("Please enter image url:")     # getting the image,checking its type and saving it in .png format
-    url = "Resources/five.png"
+    url = "Resources/tiger.jpg"
     img = cv2.imread(url,0)
     if img is None:        #Checking if the img is exist
         popupmsg("No photo found!")

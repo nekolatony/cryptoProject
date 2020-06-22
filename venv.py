@@ -16,18 +16,3 @@ class DH_Endpoint(object):
         self.full_key = full_key
         return full_key
 
-sharedBase = 197
-privateKeyAlice = 199
-sharedPrime = 151
-privateKeyBob = 157
-
-Alice = DH_Endpoint(sharedBase, sharedPrime, privateKeyAlice)
-Bob = DH_Endpoint(sharedBase, sharedPrime, privateKeyBob)
-alicePartialKey=Alice.generate_partial_key()
-print(alicePartialKey) #147
-bobPartialKey=Bob.generate_partial_key()
-print(bobPartialKey)
-aliceFullKey=Alice.generate_full_key(bobPartialKey)
-print(aliceFullKey) #75
-bobFullKey=Bob.generate_full_key(alicePartialKey)
-print(bobFullKey) #75

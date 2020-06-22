@@ -38,37 +38,3 @@ def encrypt(sentence, key):   # sentence = string
     cipher.append(D)
     return orgi,cipher
 
-
-def main():
-    print ("ENCRYPTION: ")
-    #key='A WORD IS A WORD'
-    key =raw_input("Enter Key(0-16 characters): ")
-    if len(key) <16:
-        key = key + " "*(16-len(key))
-    key = key[:16]
-                         
-    print ("UserKey: "+key )
-    s = generateKey(key)
-    #sentence = 'I WORD IS A WORD'
-
-    sentence =raw_input("Enter Sentence(0-16 characters): ")
-    if len(sentence) <16:
-        sentence = sentence + " "*(16-len(sentence))
-    sentence = sentence[:16]
-    
-    orgi,cipher = encrypt(sentence,s)
-    esentence = deBlocker(cipher)
-    
-    print ("\nInput String: "+sentence )
-    print ("Original String list: ",orgi)
-    print ("Length of Input String: ",len(sentence))
-    
-    print ("\nEncrypted String list: ",cipher)
-    print ("Encrypted String: " + esentence)
-    print ("Length of Encrypted String: ",len(esentence))
-    f = open("encrypted.txt","w")
-    f.write(esentence);
-    f.close()
-
-if __name__ == "__main__":
-    main()

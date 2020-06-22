@@ -45,33 +45,3 @@ def decrypt(encryptedBlock, key):
     return cipher,orgi
 
 
-
-def main():
-    print ("DECRYPTION: ")
-    #key='A WORD IS A WORD'
-    key =raw_input("Enter Key(0-16 characters): ")
-    if len(key) <16:
-        key = key + " "*(16-len(key))
-    key = key[:16]
-                         
-    print ("UserKey: "+key )
-    s = generateKey(key)
-    f = open("encrypted.txt","r")
-    if not f:
-        print ("Encrypted input not found in encrypted.txt")
-        sys.exit(0)
-    else:
-        esentence = f.readline()
-    cipher,orgi = decrypt(esentence,s)
-    sentence = deBlocker(orgi)
-    print ("\nEncrypted String list: ",cipher)
-    print ("Encrypted String: " + esentence)
-    print ("Length of Encrypted String: ",len(esentence))
-
-    print ("\nDecrypted String list: ",orgi)
-    print ("Decrypted String: " + sentence )
-    print ("Length of Decrypted String: ",len(sentence))
-    
-
-if __name__ == "__main__":
-    main()
