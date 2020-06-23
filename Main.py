@@ -1,3 +1,5 @@
+import secrets
+
 import cv2 as cv2
 import numpy as np
 from CBC_mode import *
@@ -9,7 +11,7 @@ def closeWindow(root):
     root.destroy()
 
 def startDecrypting(root, container, innerContainer, cipherImg, cipheredPixels, RCKey, imgMatrix):
-     print("Encrypted pixels (long): " + str(cipheredPixels))
+     # print("Encrypted pixels (long): " + str(cipheredPixels))
 
      encryptedWords = []                            # list of string words
      de = deBlocker(cipheredPixels)      # string
@@ -17,13 +19,13 @@ def startDecrypting(root, container, innerContainer, cipherImg, cipheredPixels, 
          encryptedWords.append(de[i:i+4])
 
      decryptedImgArray =  CBC_decrypt(encryptedWords,RCKey)
-     print("Decrypted pixels: "+ str(decryptedImgArray))
+     # print("Decrypted pixels: "+ str(decryptedImgArray))
 
      decryptedImg = np.empty([len(cipherImg), len(cipherImg[0])], dtype=int)  # long/int
 
      k = 0
-     print("size of image     = ", str(len(imgMatrix) * len(imgMatrix[0])))
-     print("size of decrepted = ",len(decryptedImgArray))
+     # print("size of image     = ", str(len(imgMatrix) * len(imgMatrix[0])))
+     # print("size of decrepted = ",len(decryptedImgArray))
      for i in range(len(imgMatrix)):
          for j in range(len(imgMatrix[0])):
              decryptedImg[i][j] = int(decryptedImgArray[k])
@@ -47,20 +49,24 @@ def startDecrypting(root, container, innerContainer, cipherImg, cipheredPixels, 
 def startEncrypting(root, container, innerContainer, imageMatrix):   # takes a photo as input and encrypts it with cr6 with CBC mode
 
     orginalPixels = ConvertImageToStringArray(imageMatrix)    # list of string , each slot is a word of 4 chars ( 4 words = block)
-    print("size of orginalPixels = ", len(orginalPixels))
+    # print("size of orginalPixels = ", len(orginalPixels))
 
-    user1 = venv.DH_Endpoint(197, 151, 199)
-    user2 = venv.DH_Endpoint(197, 151, 157)
+    a = secrets.randbelow(groups[14][1] - 1)
+    b =secrets.randbelow(groups[14][1] - 1)
+    print("a = ",a,"\n","b = ",b)
+    print("prime = ",groups[14][1])
+    user1 = venv.DH_Endpoint(groups[14][0], groups[14][1], a)
+    user2 = venv.DH_Endpoint(groups[14][0], groups[14][1],b )
     alicePartialKey = user1.generate_partial_key()
     bobPartialKey = user2.generate_partial_key()
     key = user1.generate_full_key(alicePartialKey)
     key = user2.generate_full_key(bobPartialKey)
+
+
+    key = key % (2**52)     # gives us key of size 128 bit
     key = str(key)
-    if len(key) < 16:             # complete the key to 128bit
-        key = key + " " * (16 - len(key))
-    key = key[:16]
+    print("length of key = ",len(key))
     RCKey = generateKey(key)
-    print(orginalPixels)
 
     cipheredPixels = CBC_encrypt(orginalPixels, RCKey)   # list of long  //  0.25 the length of the image
 
@@ -88,7 +94,7 @@ def startEncrypting(root, container, innerContainer, imageMatrix):   # takes a p
 
 def main():
 
-    print("Please enter image url:")     # getting the image,checking its type and saving it in .png format
+    # getting the image,checking its type and saving it in .png format
     url = "Resources/tiger.jpg"
     img = cv2.imread(url,0)
     if img is None:        #Checking if the img is exist

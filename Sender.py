@@ -170,7 +170,8 @@ def main():
 
         DH = D_H.new(14)       # used diffie hellman to get the key used in the encryption
         key = DH.negotiate(s)   # sending the public key to the reciever and recieving the public key of the reciever
-
+        key = key % (2 ** 52)  # gives us key of size 128 bit
+        key = str(key)
 
         root = tk.Tk()
         root.title("SENDER")

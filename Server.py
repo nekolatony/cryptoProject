@@ -37,8 +37,9 @@ def main():
 
 
                 # Senderkey = pickle.loads(recv_msg(sender))
-                Senderkey =str(DH.acceptNegotiation(sender))  # smeding the public key to the reciever and recieving the public key of the reciever
-                Senderkey = Senderkey[:16]
+                Senderkey =DH.acceptNegotiation(sender)  # smeding the public key to the reciever and recieving the public key of the reciever
+                Senderkey = Senderkey % 2**52
+                Senderkey = str(Senderkey)
                 RCsenderKey = generateKey(Senderkey)
 
                 print(Senderkey)
@@ -47,15 +48,12 @@ def main():
                 DH = D_H.new(14)  # used diffie hellman to get the key used in the encryption
                 # Recieverkey = pickle.loads(recv_msg(reciever))
 
-                Recieverkey =str(DH.acceptNegotiation(reciever))  # smeding the public key to the reciever and recieving the public key of the reciever
-                Recieverkey = Recieverkey[:16]
+                Recieverkey =DH.acceptNegotiation(reciever)  # smeding the public key to the reciever and recieving the public key of the reciever
+                Recieverkey = Recieverkey % 2**52
+                Recieverkey = str(Recieverkey)
                 RCrecieverKey = generateKey(Recieverkey)
 
                 print(Recieverkey)
-
-                # send_msg(reciever,SenderPublicKey)
-                # send_msg(sender,RecieverPublicKey)
-
 
                 cipherImage = pickle.loads(recv_msg(sender))
                 cipherdPixels =pickle.loads(recv_msg(sender))
@@ -66,16 +64,14 @@ def main():
                 de = deBlocker(cipherdPixels)
                 for i in range(0, len(de), 4):
                     enc.append(de[i:i + 4])
-                # print("deBlocker (String): " +de)
                 print(enc)
                 decryptedM = CBC_decrypt(enc, RCsenderKey)
                 cipherImage1 = np.empty([len(cipherImage), len(cipherImage[0])], dtype=int)
-
+                print(decryptedM)
                 k = 0
                 for i in range(len(cipherImage1)):
                     for j in range(len(cipherImage1[0])):
-                        # cipherImage[i][j] = int(decryptedM[k], base=10) % 256
-                        cipherImage1[i][j] = decryptedM[k]
+                        cipherImage1[i][j] = int(decryptedM[k])
                         k = k + 1
 
                 cv2.imwrite('Resources/Serverdecrypted.png', cipherImage1)
@@ -92,20 +88,16 @@ def main():
                 img = np.empty([len(cipherImage) , len(cipherImage[0]) ], dtype=int)
 
                 k = 0
-                flag = 0
                 for i in range(len(cipherImage)):
                     for j in range(len(cipherImage[0])):
                         img[i][j] = cipheredPixel[k] % 256
-                        flag = flag + 1
-                        if flag == 4:
-                            k = k + 1
-                            flag = 0
+                        k = k + 1
 
                 cv2.imwrite('Resources/Serverencrypted.png', img)
 
                 send_msg(reciever, pickle.dumps(img))
                 send_msg(reciever, pickle.dumps(cipheredPixel))
-
+                s.close()
 
 if __name__ == "__main__":
     main()

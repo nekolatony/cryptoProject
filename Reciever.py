@@ -43,10 +43,9 @@ class App(threading.Thread):
 # callback fuction to decrypt the Image
 def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,key):
 
+
+    key = key % (2 ** 52)  # gives us key of size 128 bit
     key = str(key)
-    if len(key) < 16:
-        key = key + " " * (16 - len(key))
-    key = key[:16]
     RCKey = generateKey(key)
 
     enc = []
@@ -62,7 +61,7 @@ def startDecrypting(root, frame, iframe6, cipherImage,cipheredPixels, s,key):
     k = 0
     for i in range(len(cipherImage)):
         for j in range(len(cipherImage[0])):
-            cipherImage[i][j] = decryptedM[k]
+            cipherImage[i][j] = int(decryptedM[k])
             k = k + 1
 
 
